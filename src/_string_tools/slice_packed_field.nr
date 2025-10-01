@@ -381,10 +381,10 @@ global INTEGER_UP_TO_62_IS_GREATER_THAN_31: [bool; 63] = [
     true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
     true, true, true, true, true, true,
 ];
-global NUM_BYTES_MOD_31_IS_ZERO: [bool; 31] = [
+global NUM_BYTES_MOD_31_IS_ZERO: [bool; 33] = [
     true, false, false, false, false, false, false, false, false, false, false, false, false, false,
     false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false,
+    false, false, false, false, true, false,
 ];
 global BYTE_SHIFT: [Field; 32] = [
     1,
