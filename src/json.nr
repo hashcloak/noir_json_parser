@@ -728,9 +728,10 @@ impl<let NumBytes: u32, let NumPackedFields: u32, let MaxNumTokens: u32, let Max
         assert(stringbytes.len() <= NumBytes, "json length exceeds NumBytes!");
         let mut text: [u8; NumBytes] = [0; NumBytes];
         for i in 0..BoundedBytes {
-            text[i] = stringbytes.get(i);
             if i >= stringbytes.len() {
                 text[i] = 32;
+            } else {
+                text[i] = stringbytes.get(i);
             }
         }
         for i in BoundedBytes..NumBytes {

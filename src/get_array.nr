@@ -27,7 +27,7 @@ impl<let NumBytes: u32, let NumPackedFields: u32, let MaxNumTokens: u32, let Max
     /// if the root JSON is an object, extract an array given by `key`
     ///
     /// returns an Option<JSON> where, if the array exists, the JSON object will have the requested array as its root value
-    pub(crate) fn get_array<K>(self, key: K) -> Option<Self>
+    pub fn get_array<K>(self, key: K) -> Option<Self>
     where
         K: KeyHashable,
     {
