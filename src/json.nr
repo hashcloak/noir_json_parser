@@ -722,6 +722,46 @@ impl<let NumBytes: u32, let NumPackedFields: u32, let MaxNumTokens: u32, let Max
         };
     }
 
+    pub fn parse_bounded_vec_json<let BoundedBytes: u32>(
+        stringbytes: BoundedVec<u8, BoundedBytes>,
+    ) -> Self {
+        assert(stringbytes.len() <= NumBytes, "json length exceeds NumBytes!");
+        let mut text: [u8; NumBytes] = [0; NumBytes];
+        for i in 0..BoundedBytes {
+            text[i] = stringbytes.get(i);
+            if i >= stringbytes.len() {
+                text[i] = 32;
+            }
+        }
+        for i in BoundedBytes..NumBytes {
+            text[i] = 32; // whitespace character
+        }
+        let mut json = JSON {
+            json: text,
+            raw_transcript: [0; MaxNumTokens],
+            transcript: [0; MaxNumTokens],
+            transcript_length: 0,
+            key_data: [0; MaxNumValues],
+            key_hashes: [0; MaxNumValues],
+            layer_type_of_root: 0,
+            root_id: 1,
+            root_index_in_transcript: 0,
+            json_entries_packed: [JSONEntryPacked::default(); MaxNumValues],
+            unsorted_json_entries_packed: [JSONEntryPacked::default(); MaxNumValues],
+            json_packed: [0; NumPackedFields],
+        };
+
+        json = json.build_transcript();
+        json.capture_missing_tokens();
+        json.keyswap();
+        json.compute_json_packed();
+        json.create_json_entries();
+
+        json.compute_keyhash_and_sort_json_entries();
+
+        json
+    }
+
     pub fn parse_json<let StringBytes: u32>(stringbytes: [u8; StringBytes]) -> Self {
         assert(StringBytes <= NumBytes, "json length exceeds NumBytes!");
         let mut text: [u8; NumBytes] = [0; NumBytes];
