@@ -658,7 +658,8 @@ impl<let NumBytes: u32, let NumPackedFields: u32, let MaxNumTokens: u32, let Max
             let entry = TranscriptEntry::to_field(TranscriptEntry { token, index, length });
 
             if token == LITERAL_TOKEN as Field {
-                index.assert_max_bit_size::<8>();
+                // Increasing this to support up to 16384 bytes in JSON
+                index.assert_max_bit_size::<14>();
                 let index_as_u32 = index as u32;
                 let first_char = self.json[index_as_u32];
                 let second_char = self.json[index_as_u32 + 1];
