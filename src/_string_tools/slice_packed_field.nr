@@ -1,4 +1,5 @@
 use crate::utils::cast_num_to_u32;
+
 /**
  * @file methods to extract data efficiently from Field elements that represent 31 bytes of packed data
  **/
@@ -334,151 +335,43 @@ global tail_path_multipliers_chunk0: [Field; 32] = [
 // M[4] = 1 i.e. the limbs[4] should contain the last limb
 // array extends to 0x200000000 which is 2^33 => 33 31 byte limbs = 1,023 bytes
 // this puts a hard limit on the max size of a key that this program supports.
-// Edit: the hard limit seems to be on any strings within the JSON
-// global LAST_LIMB_PATH: [Field; 36] = [
-//     0x000000000, // 0 0 0 0 0 0 0 0 0 <-- edge case because sometimes array index is -1, so we offset by 1 TODO explain better
-//     0x000000000, // 0 0 0 0 0 0 0 0 1
-//     0x000000001, // 0 0 0 0 0 0 0 1 0
-//     0x000000003, // 0 0 0 0 0 0 1 0 0
-//     0x000000007, // 0 0 0 0 0 1 0 0 0
-//     0x00000000f, // 0 0 0 0 1 0 0 0 0
-//     0x00000001f, // 0 0 0 1 0 0 0 0 0
-//     0x00000003f, // 0 0 1 0 0 0 0 0 0
-//     0x00000007f, // 0 1 0 0 0 0 0 0 0
-//     0x0000000ff, // 1 0 0 0 0 0 0 0 0
-//     0x0000001ff, // 0 0 0 0 0 0 0 1 0
-//     0x0000003ff, // 0 0 0 0 0 0 1 0 0
-//     0x0000007ff, // 0 0 0 0 0 1 0 0 0
-//     0x000000fff, // 0 0 0 0 1 0 0 0 0
-//     0x000001fff, // 0 0 0 1 0 0 0 0 0
-//     0x000003fff, // 0 0 1 0 0 0 0 0 0
-//     0x000007fff, // 0 1 0 0 0 0 0 0 0
-//     0x00000ffff, // 0 0 0 0 0 0 0 0 1
-//     0x00001ffff, // 0 0 0 0 0 0 0 1 0
-//     0x00003ffff, // 0 0 0 0 0 0 1 0 0
-//     0x00007ffff, // 0 0 0 0 0 1 0 0 0
-//     0x0000fffff, // 0 0 0 0 1 0 0 0 0
-//     0x0001fffff, // 0 0 0 1 0 0 0 0 0
-//     0x0003fffff, // 0 0 1 0 0 0 0 0 0
-//     0x0007fffff, // 0 1 0 0 0 0 0 0 0
-//     0x000ffffff, // 0 0 0 0 0 0 0 0 1
-//     0x001ffffff, // 0 0 0 0 0 0 0 1 0
-//     0x003ffffff, // 0 0 0 0 0 0 1 0 0
-//     0x007ffffff, // 0 0 0 0 0 1 0 0 0
-//     0x00fffffff, // 0 0 0 0 1 0 0 0 0
-//     0x01fffffff, // 0 0 0 1 0 0 0 0 0
-//     0x03fffffff, // 0 0 1 0 0 0 0 0 0
-//     0x07fffffff, // 0 1 0 0 0 0 0 0 0
-//     0x0ffffffff,
-//     0x1ffffffff,
-//     0x3ffffffff,
-// ];
-global LAST_LIMB_PATH: [Field; 105] = [
-    0x0, // 0
-    0x0, // 1
-    0x1, // 2
-    0x3, // 3
-    0x7, // 4
-    0xf, // 5
-    0x1f, // 6
-    0x3f, // 7
-    0x7f, // 8
-    0xff, // 9
-    0x1ff, // 10
-    0x3ff, // 11
-    0x7ff, // 12
-    0xfff, // 13
-    0x1fff, // 14
-    0x3fff, // 15
-    0x7fff, // 16
-    0xffff, // 17
-    0x1ffff, // 18
-    0x3ffff, // 19
-    0x7ffff, // 20
-    0xfffff, // 21
-    0x1fffff, // 22
-    0x3fffff, // 23
-    0x7fffff, // 24
-    0xffffff, // 25
-    0x1ffffff, // 26
-    0x3ffffff, // 27
-    0x7ffffff, // 28
-    0xfffffff, // 29
-    0x1fffffff, // 30
-    0x3fffffff, // 31
-    0x7fffffff, // 32
-    0xffffffff, // 33
-    0x1ffffffff, // 34
-    0x3ffffffff, // 35
-    0x7ffffffff, // 36
-    0xfffffffff, // 37
-    0x1fffffffff, // 38
-    0x3fffffffff, // 39
-    0x7fffffffff, // 40
-    0xffffffffff, // 41
-    0x1ffffffffff, // 42
-    0x3ffffffffff, // 43
-    0x7ffffffffff, // 44
-    0xfffffffffff, // 45
-    0x1fffffffffff, // 46
-    0x3fffffffffff, // 47
-    0x7fffffffffff, // 48
-    0xffffffffffff, // 49
-    0x1ffffffffffff, // 50
-    0x3ffffffffffff, // 51
-    0x7ffffffffffff, // 52
-    0xfffffffffffff, // 53
-    0x1fffffffffffff, // 54
-    0x3fffffffffffff, // 55
-    0x7fffffffffffff, // 56
-    0xffffffffffffff, // 57
-    0x1ffffffffffffff, // 58
-    0x3ffffffffffffff, // 59
-    0x7ffffffffffffff, // 60
-    0xfffffffffffffff, // 61
-    0x1fffffffffffffff, // 62
-    0x3fffffffffffffff, // 63
-    0x7fffffffffffffff, // 64
-    0xffffffffffffffff, // 65
-    0x1ffffffffffffffff, // 66
-    0x3ffffffffffffffff, // 67
-    0x7ffffffffffffffff, // 68
-    0xfffffffffffffffff, // 69
-    0x1fffffffffffffffff, // 70
-    0x3fffffffffffffffff, // 71
-    0x7fffffffffffffffff, // 72
-    0xffffffffffffffffff, // 73
-    0x1ffffffffffffffffff, // 74
-    0x3ffffffffffffffffff, // 75
-    0x7ffffffffffffffffff, // 76
-    0xfffffffffffffffffff, // 77
-    0x1fffffffffffffffffff, // 78
-    0x3fffffffffffffffffff, // 79
-    0x7fffffffffffffffffff, // 80
-    0xffffffffffffffffffff, // 81
-    0x1ffffffffffffffffffff, // 82
-    0x3ffffffffffffffffffff, // 83
-    0x7ffffffffffffffffffff, // 84
-    0xfffffffffffffffffffff, // 85
-    0x1fffffffffffffffffffff, // 86
-    0x3fffffffffffffffffffff, // 87
-    0x7fffffffffffffffffffff, // 88
-    0xffffffffffffffffffffff, // 89
-    0x1ffffffffffffffffffffff, // 90
-    0x3ffffffffffffffffffffff, // 91
-    0x7ffffffffffffffffffffff, // 92
-    0xfffffffffffffffffffffff, // 93
-    0x1fffffffffffffffffffffff, // 94
-    0x3fffffffffffffffffffffff, // 95
-    0x7fffffffffffffffffffffff, // 96
-    0xffffffffffffffffffffffff, // 97
-    0x1ffffffffffffffffffffffff, // 98
-    0x3ffffffffffffffffffffffff, // 99
-    0x7ffffffffffffffffffffffff, // 100
-    0xfffffffffffffffffffffffff, // 101
-    0x1fffffffffffffffffffffffff, // 102
-    0x3fffffffffffffffffffffffff, // 103
-    0x7fffffffffffffffffffffffff, // 104
+global LAST_LIMB_PATH: [Field; 36] = [
+    0x000000000, // 0 0 0 0 0 0 0 0 0 <-- edge case because sometimes array index is -1, so we offset by 1 TODO explain better
+    0x000000000, // 0 0 0 0 0 0 0 0 1
+    0x000000001, // 0 0 0 0 0 0 0 1 0
+    0x000000003, // 0 0 0 0 0 0 1 0 0
+    0x000000007, // 0 0 0 0 0 1 0 0 0
+    0x00000000f, // 0 0 0 0 1 0 0 0 0
+    0x00000001f, // 0 0 0 1 0 0 0 0 0
+    0x00000003f, // 0 0 1 0 0 0 0 0 0
+    0x00000007f, // 0 1 0 0 0 0 0 0 0
+    0x0000000ff, // 1 0 0 0 0 0 0 0 0
+    0x0000001ff, // 0 0 0 0 0 0 0 1 0
+    0x0000003ff, // 0 0 0 0 0 0 1 0 0
+    0x0000007ff, // 0 0 0 0 0 1 0 0 0
+    0x000000fff, // 0 0 0 0 1 0 0 0 0
+    0x000001fff, // 0 0 0 1 0 0 0 0 0
+    0x000003fff, // 0 0 1 0 0 0 0 0 0
+    0x000007fff, // 0 1 0 0 0 0 0 0 0
+    0x00000ffff, // 0 0 0 0 0 0 0 0 1
+    0x00001ffff, // 0 0 0 0 0 0 0 1 0
+    0x00003ffff, // 0 0 0 0 0 0 1 0 0
+    0x00007ffff, // 0 0 0 0 0 1 0 0 0
+    0x0000fffff, // 0 0 0 0 1 0 0 0 0
+    0x0001fffff, // 0 0 0 1 0 0 0 0 0
+    0x0003fffff, // 0 0 1 0 0 0 0 0 0
+    0x0007fffff, // 0 1 0 0 0 0 0 0 0
+    0x000ffffff, // 0 0 0 0 0 0 0 0 1
+    0x001ffffff, // 0 0 0 0 0 0 0 1 0
+    0x003ffffff, // 0 0 0 0 0 0 1 0 0
+    0x007ffffff, // 0 0 0 0 0 1 0 0 0
+    0x00fffffff, // 0 0 0 0 1 0 0 0 0
+    0x01fffffff, // 0 0 0 1 0 0 0 0 0
+    0x03fffffff, // 0 0 1 0 0 0 0 0 0
+    0x07fffffff, // 0 1 0 0 0 0 0 0 0
+    0x0ffffffff,
+    0x1ffffffff,
+    0x3ffffffff,
 ];
 
 global INTEGER_UP_TO_62_IS_GREATER_THAN_31: [bool; 63] = [
@@ -488,144 +381,10 @@ global INTEGER_UP_TO_62_IS_GREATER_THAN_31: [bool; 63] = [
     true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
     true, true, true, true, true, true,
 ];
-// global NUM_BYTES_MOD_31_IS_ZERO: [bool; 94] = [
-//     true, false, false, false, false, false, false, false, false, false, false, false, false, false,
-//     false, false, false, false, false, false, false, false, false, false, false, false, false,
-//     false, false, false, false, true, false, false, false, false, false, false, false, false, false,
-//     false, false, false, false, false, false, false, false, false, false, false, false, false,
-//     false, false, false, false, false, false, false, false, true, false, false, false, false, false,
-//     false, false, false, false, false, false, false, false, false, false, false, false, false,
-//     false, false, false, false, false, false, false, false, false, false, false, false, true,
-// ];
-global NUM_BYTES_MOD_31_IS_ZERO: [bool; 128] = [
-    true, // 0
-    false, // 1
-    false, // 2
-    false, // 3
-    false, // 4
-    false, // 5
-    false, // 6
-    false, // 7
-    false, // 8
-    false, // 9
-    false, // 10
-    false, // 11
-    false, // 12
-    false, // 13
-    false, // 14
-    false, // 15
-    false, // 16
-    false, // 17
-    false, // 18
-    false, // 19
-    false, // 20
-    false, // 21
-    false, // 22
-    false, // 23
-    false, // 24
-    false, // 25
-    false, // 26
-    false, // 27
-    false, // 28
-    false, // 29
-    false, // 30
-    false, // 31
-    false, // 32
-    false, // 33
-    false, // 34
-    false, // 35
-    false, // 36
-    false, // 37
-    false, // 38
-    false, // 39
-    false, // 40
-    false, // 41
-    false, // 42
-    false, // 43
-    false, // 44
-    false, // 45
-    false, // 46
-    false, // 47
-    false, // 48
-    false, // 49
-    false, // 50
-    false, // 51
-    false, // 52
-    false, // 53
-    false, // 54
-    false, // 55
-    false, // 56
-    false, // 57
-    false, // 58
-    false, // 59
-    false, // 60
-    false, // 61
-    false, // 62
-    false, // 63
-    false, // 64
-    false, // 65
-    false, // 66
-    false, // 67
-    false, // 68
-    false, // 69
-    false, // 70
-    false, // 71
-    false, // 72
-    false, // 73
-    false, // 74
-    false, // 75
-    false, // 76
-    false, // 77
-    false, // 78
-    false, // 79
-    false, // 80
-    false, // 81
-    false, // 82
-    false, // 83
-    false, // 84
-    false, // 85
-    false, // 86
-    false, // 87
-    false, // 88
-    false, // 89
-    false, // 90
-    false, // 91
-    false, // 92
-    false, // 93
-    false, // 94
-    false, // 95
-    false, // 96
-    false, // 97
-    false, // 98
-    false, // 99
-    false, // 100
-    false, // 101
-    false, // 102
-    false, // 103
-    false, // 104
-    false, // 105
-    false, // 106
-    false, // 107
-    false, // 108
-    false, // 109
-    false, // 110
-    false, // 111
-    false, // 112
-    false, // 113
-    false, // 114
-    false, // 115
-    false, // 116
-    false, // 117
-    false, // 118
-    false, // 119
-    false, // 120
-    false, // 121
-    false, // 122
-    false, // 123
-    false, // 124
-    false, // 125
-    false, // 126
-    false, // 127
+global NUM_BYTES_MOD_31_IS_ZERO: [bool; 33] = [
+    true, false, false, false, false, false, false, false, false, false, false, false, false, false,
+    false, false, false, false, false, false, false, false, false, false, false, false, false,
+    false, false, false, false, true, false,
 ];
 global BYTE_SHIFT: [Field; 32] = [
     1,
