@@ -30,7 +30,7 @@ impl JSONLiteral {
     pub(crate) fn is_false(self) -> bool {
         self.value == 0
     }
-    pub(crate) fn to_bool(self) -> bool {
+    pub fn to_bool(self) -> bool {
         self.value == 2
     }
 }
@@ -64,7 +64,7 @@ impl<let NumBytes: u32, let NumPackedFields: u32, let MaxNumTokens: u32, let Max
     /// if the root JSON is an object, extract a literal value given by `key`
     ///
     /// returns an Option<JSONLiteral> which will be null if the literal does not exist
-    pub(crate) fn get_literal<K>(self, key: K) -> Option<JSONLiteral>
+    pub fn get_literal<K>(self, key: K) -> Option<JSONLiteral>
     where
         K: KeyHashable,
     {
